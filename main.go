@@ -2,30 +2,21 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
-	"os"
+	"log"
 
+	"github.com/Erikadarisman/go-rest-api/driver"
 	"github.com/joho/godotenv"
-
 	_ "github.com/lib/pq"
 )
 
+var db *sql.DB
+
+func init() {
+	godotenv.Load()
+}
+
 func main() {
-	err := godotenv.Load()
-	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		// host, port, user, password, dbname
-		os.Getenv("HOST"), os.Getenv("PORT"), os.Getenv("USERDB"), os.Getenv("PASSWORDDB"), os.Getenv("DBNAME"))
-	db, err := sql.Open("postgres", psqlInfo)
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
+	db = driver.ConnectDB()
 
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("Successfully connected!")
+	log.Println("Server started successfully on port 8000.!!!")
 }
