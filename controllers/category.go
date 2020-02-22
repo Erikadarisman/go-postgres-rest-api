@@ -42,3 +42,18 @@ func (c Controller) GetAllCategory(db *pgxpool.Pool) http.HandlerFunc {
 		json.NewEncoder(w).Encode(response)
 	}
 }
+
+//GetAllCategory - method to handle get categories
+// func (c Controller) GetAllCategory(db *pgxpool.Pool) http.HandlerFunc {
+// 	var url string
+// 	err := db.Query(context.Background(), "Select id,name from public.category")
+
+// 	switch err {
+// 	case nil:
+// 		http.Redirect(w, req, url, http.StatusSeeOther)
+// 	case pgx.ErrNoRows:
+// 		http.NotFound(w, req)
+// 	default:
+// 		http.Error(w, "Internal server error", http.StatusInternalServerError)
+// 	}
+// }

@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gorilla/mux"
+
 	"github.com/Erikadarisman/go-rest-api/controllers"
 	"github.com/jackc/pgx/pgxpool"
 
@@ -22,10 +24,11 @@ func main() {
 	db := driver.ConnectDB()
 	controller := controllers.Controller{}
 
-	http.HandleFunc("/listcategories", controller.GetAllCategory(db))
+	router := mux.NewRouter()
+	router.HandleFunc("/listcategories", controller.GetAllCategory(db)).Methods("GET")
 
-	log.Info("Starting URL shortener on localhost:8080")
-	err := http.ListenAndServe("localhost:8080", nil)
+	log.Info("Starting Note APP on localhost:8080")
+	err := http.ListenAndServe("localhost:8080", router)
 	if err != nil {
 		log.Crit("Unable to start web server", "error", err)
 		os.Exit(1)
