@@ -1,25 +1,26 @@
 package controllers
 
 import (
-	"database/sql"
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
 
 	"github.com/Erikadarisman/go-rest-api/models"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 // Controller this
 type Controller struct{}
 
 //GetAllCategory - method to handle get categories
-func (c Controller) GetAllCategory(db *sql.DB) http.HandlerFunc {
+func (c Controller) GetAllCategory(db *pgxpool.Pool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var category models.Category
 		var arrCat []models.Category
 		var response models.Response
 
-		rows, err := db.Query("Select id,name from public.category")
+		rows, err := db.Query(context.Background(), "Select id,name from public.category")
 		if err != nil {
 			log.Print(err)
 		}

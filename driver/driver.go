@@ -1,41 +1,33 @@
 package driver
 
 import (
-	"database/sql"
-	"log"
+	"context"
 	"os"
 
-	"github.com/lib/pq"
+	"github.com/jackc/pgx/v4/log/log15adapter"
+	"github.com/jackc/pgx/v4/pgxpool"
+	log "gopkg.in/inconshreveable/log15.v2"
 )
 
-var db *sql.DB
+var db *pgxpool.Pool
 
-func ConnectDB() *sql.DB {
-	pgURL, err := pq.ParseURL(os.Getenv("APP_DB_URL"))
+// ConnectDB for connection db
+func ConnectDB() *pgxpool.Pool {
+	logger := log15adapter.NewLogger(log.New("module", "pgx"))
+	poolConfig, err := pgxpool.ParseConfig(os.Getenv("APP_DB_URL"))
+
 	if err != nil {
-		log.Fatalln("Error while connecting to DB")
+		log.Crit("Unable to parse APP_DB_URL", "error", err)
 		os.Exit(1)
 	}
 
-	db, err = sql.Open("postgres", pgURL)
-	if err != nil {
-		log.Fatal(err)
-	}
+	poolConfig.ConnConfig.Logger = logger
 
-	err = db.Ping() //if ping does not retunr anything that means connection is established successfully
+	db, err = pgxpool.ConnectConfig(context.Background(), poolConfig)
 	if err != nil {
-		log.Fatal(err)
+		log.Crit("Unable to create connection pool", "error", err)
 		os.Exit(1)
 	}
 
 	return db
 }
-
-// func connectDB() *sql.DB {
-// 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+"password=%s dbname=%s sslmode=disable",
-// 		os.Getenv("HOST"), os.Getenv("PORT"), os.Getenv("USERDB"), os.Getenv("PASSWORDDB"), os.Getenv("DBNAME"))
-// 	// host, port, user, password, dbname
-
-// 	conn, err := sql.Open("postgres", psqlInfo)
-
-// }
